@@ -11,5 +11,6 @@ type BarcodeSrv interface {
 	GetByID(uint) (core.BarcodeCondition, error)
 	Create(dto.BarCodeInput) (core.BarcodeCondition, error)
 	UpdateByID(uint, dto.BarCodeUpdate) error
+	DeleteByID(uint) error
 	GenBarCode(string, bool, uint) (string error)
 }
