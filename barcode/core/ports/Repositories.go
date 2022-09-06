@@ -12,5 +12,5 @@ type BarcodeRpstr interface {
 	Create(dto.BarCodeInput) (core.BarcodeCondition, error)
 	UpdateByID(uint, dto.BarCodeUpdate) error
 	DeleteByID(uint) error
-	GenBarCode(string, bool, uint) error
+	GetByCond(string, bool) (core.BarcodeCondition, error)
 }
