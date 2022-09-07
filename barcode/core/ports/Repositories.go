@@ -9,8 +9,8 @@ import (
 type BarcodeRpstr interface {
 	GetAll() []core.BarcodeCondition
 	GetByID(uint) (core.BarcodeCondition, error)
+	GetByCond(string, bool) (core.BarcodeCondition, error)
 	Create(dto.BarCodeInput) (core.BarcodeCondition, error)
 	UpdateByID(uint, dto.BarCodeUpdate) error
 	DeleteByID(uint) error
-	GetByCond(string, bool) (core.BarcodeCondition, error)
 }
