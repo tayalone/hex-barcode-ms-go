@@ -1,0 +1,60 @@
+@hostname = http://localhost
+@barcode_port = 5001
+### call to jsonplaceholder
+@order_port = 5002
+
+
+GET {{hostname}}:{{barcode_port}}/healtz HTTP/1.1
+####
+
+
+GET {{hostname}}:{{barcode_port}}/barcode HTTP/1.1
+####
+
+
+
+GET {{hostname}}:{{barcode_port}}/barcode/1 HTTP/1.1
+####
+
+
+POST  {{hostname}}:{{barcode_port}}/barcode HTTP/1.1
+content-type: application/json
+
+{
+    "courierCode": "DHL",
+    "isCod": true,
+    "startBarcode": "DCB00000001XTH",
+    "batchSize": 10000
+}
+###
+
+
+PATCH {{hostname}}:{{barcode_port}}/barcode/3 HTTP/1.1
+content-type: application/json
+
+{
+    "courierCode": "DHL",
+    "isCod": true,
+    "batchSize": 100000
+}
+###
+
+###
+DELETE  {{hostname}}:{{barcode_port}}/barcode/3 HTTP/1.1
+
+
+###
+
+
+GET {{hostname}}:{{order_port}}/status HTTP/1.1
+####
+
+### create order 
+POST {{hostname}}:{{order_port}}/order HTTP/1.1
+content-type: application/json
+
+{
+    "courierCode": "DHL",
+    "isCod": true
+}
+###

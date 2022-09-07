@@ -19,6 +19,18 @@ services:
       - 8080:8080
     depends_on:
       - rdb
+  rabbitmq:
+    image: rabbitmq:3.10.7-management-alpine
+    container_name: "rabbitmq"
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
   barcode-srv:
     image: cosmtrek/air
     working_dir: /project
@@ -35,28 +47,33 @@ services:
       - RDM_DB=testing
       - RDM_MIGRATION=false
       - TIME_ZONE=Asia/Bangkok
+      - RMQ_HOST=rabbitmq
+      - RMQ_USR=guest
+      - RMQ_PASS=guest
+      - RMQ_PORT=5672
     command: air
     depends_on:
       - rdb
-  order-srv:
-    image: cosmtrek/air
-    working_dir: /project
-    volumes:
-      - ./order/:/project/
-    ports:
-      - "5002:5002"
-    environment:
-      - PORT=5002
-      - RDM_HOST=rdb
-      - RDM_PORT=5432
-      - RDM_USER=postgres
-      - RDM_PASSWORD=example
-      - RDM_DB=testing
-      - RDM_MIGRATION=false
-      - TIME_ZONE=Asia/Bangkok
-    command: air
-    depends_on:
-      - rdb
+      - rabbitmq
+  # order-srv:
+  #   image: cosmtrek/air
+  #   working_dir: /project
+  #   volumes:
+  #     - ./order/:/project/
+  #   ports:
+  #     - "5002:5002"
+  #   environment:
+  #     - PORT=5002
+  #     - RDM_HOST=rdb
+  #     - RDM_PORT=5432
+  #     - RDM_USER=postgres
+  #     - RDM_PASSWORD=example
+  #     - RDM_DB=testing
+  #     - RDM_MIGRATION=false
+  #     - TIME_ZONE=Asia/Bangkok
+  #   command: air
+  #   depends_on:
+  #     - rdb
 
 volumes:
   rdb:

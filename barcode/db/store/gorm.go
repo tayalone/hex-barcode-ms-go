@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/tayalone/hex-barcode-ms-go/barcode/core"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -16,6 +17,41 @@ type RDB struct {
 }
 
 var rdb = RDB{}
+
+func migrate(db *gorm.DB) {
+	// db.Set("gorm:table_options", "ENGINE=InnoDB")
+
+	// /  about 'barcode_condition'
+	if (db.Migrator().HasTable(&core.BarcodeCondition{})) {
+		log.Println("Table Existing, Drop IT")
+
+		db.Migrator().DropTable(&core.BarcodeCondition{})
+	}
+	db.AutoMigrate(&core.BarcodeCondition{})
+	log.Println("Create 'barcode_conditions'")
+
+	// / Add Initail Data
+	initBCC := []core.BarcodeCondition{
+		{
+			CourierCode:   "DHL",
+			IsCod:         true,
+			StartBarcode:  "DCA00000001XTH",
+			BatchSize:     100,
+			PrevCondLogID: 1,
+			CondLogID:     101,
+		}, {
+			CourierCode:   "DHL",
+			IsCod:         false,
+			StartBarcode:  "DNA00000001XTH",
+			BatchSize:     300,
+			PrevCondLogID: 1,
+			CondLogID:     301,
+		},
+	}
+	db.Create(initBCC)
+
+	log.Println("Create Initial 'BarcodeCondition' Data")
+}
 
 /*New do Create Rdb Connection*/
 func New() *RDB {
@@ -40,6 +76,10 @@ func New() *RDB {
 	log.Println("Connect RDB Success!!!")
 	rdb.db = db
 	rdb.errMsg = ""
+
+	if os.Getenv("RDM_MIGRATION") == "true" {
+		migrate(db)
+	}
 
 	return &rdb
 }

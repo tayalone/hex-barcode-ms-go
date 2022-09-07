@@ -19,19 +19,19 @@ type Service struct {
 var srv = Service{}
 
 /*New is Return Ptr of Services*/
-func New(r ports.BarcodeRpstr, p ports.BarcodePb) *Service {
+func New(r ports.BarcodeRpstr, p ports.BarcodePb) Service {
 	srv.barcodeRpstr = r
 	srv.barcodePb = p
-	return &srv
+	return srv
 }
 
 /*GetAll return Slice of BarcodeCondition from Rpstr*/
-func (s *Service) GetAll() []core.BarcodeCondition {
+func (s Service) GetAll() []core.BarcodeCondition {
 	return s.barcodeRpstr.GetAll()
 }
 
 /*GetByID return BarcodeCondition from Rpstr*/
-func (s *Service) GetByID(id uint) (core.BarcodeCondition, error) {
+func (s Service) GetByID(id uint) (core.BarcodeCondition, error) {
 	bc, err := s.barcodeRpstr.GetByID(id)
 	if err != nil {
 		return core.BarcodeCondition{}, err
@@ -40,7 +40,7 @@ func (s *Service) GetByID(id uint) (core.BarcodeCondition, error) {
 }
 
 /*Create return New Barcode */
-func (s *Service) Create(i dto.BarCodeInput) (core.BarcodeCondition, error) {
+func (s Service) Create(i dto.BarCodeInput) (core.BarcodeCondition, error) {
 	bc, err := s.barcodeRpstr.Create(i)
 	if err != nil {
 		return core.BarcodeCondition{}, err
@@ -49,7 +49,7 @@ func (s *Service) Create(i dto.BarCodeInput) (core.BarcodeCondition, error) {
 }
 
 /*UpdateByID  return return error whene value error */
-func (s *Service) UpdateByID(id uint, u dto.BarCodeUpdate) error {
+func (s Service) UpdateByID(id uint, u dto.BarCodeUpdate) error {
 	err := s.barcodeRpstr.UpdateByID(id, u)
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (s *Service) UpdateByID(id uint, u dto.BarCodeUpdate) error {
 }
 
 /*DeleteByID Remove Specific by ID */
-func (s *Service) DeleteByID(id uint) error {
+func (s Service) DeleteByID(id uint) error {
 	err := s.barcodeRpstr.DeleteByID(id)
 	if err != nil {
 		return err
@@ -67,8 +67,8 @@ func (s *Service) DeleteByID(id uint) error {
 }
 
 /*GenBarCode Create Barcode By Condition */
-func (s *Service) GenBarCode(courierCode string, isCod bool, id uint) (string, error) {
-	bc, errC := srv.barcodeRpstr.GetByCond(courierCode, isCod)
+func (s Service) GenBarCode(i dto.ReceiverInput) (string, error) {
+	bc, errC := srv.barcodeRpstr.GetByCond(i.CourierCode, i.IsCod)
 	if errC != nil {
 		return "", errC
 	}
@@ -88,7 +88,27 @@ func (s *Service) GenBarCode(courierCode string, isCod bool, id uint) (string, e
 
 	c, _ := strconv.Atoi(body)
 	b := c - int(bc.PrevCondLogID)
-	barcode := fmt.Sprintf("%s%s%s", prefix, fmt.Sprintf("%08d", int(id)+b), suffix)
+	barcode := fmt.Sprintf("%s%s%s", prefix, fmt.Sprintf("%08d", int(i.ID)+b), suffix)
 
 	return barcode, nil
+}
+
+/*PublishBarcode Create Barcode By Condition */
+func (s Service) PublishBarcode(i dto.ReceiverInput) error {
+	barcode, err := s.GenBarCode(i)
+	if err != nil {
+		return err
+	}
+
+	errPush := s.barcodePb.PushMessage(dto.PublisherInput{
+		CourierCode: i.CourierCode,
+		IsCod:       i.IsCod,
+		ID:          i.ID,
+		Barcode:     barcode,
+	})
+	if errPush != nil {
+		return errPush
+	}
+
+	return nil
 }
