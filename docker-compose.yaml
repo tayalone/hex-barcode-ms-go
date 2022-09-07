@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  rdb:
+    image: postgres:14.5-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: testing
+    ports:
+      - "5432:5432"
+    volumes:
+      - rdb:/var/lib/postgresql/data
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - rdb
+  barcode-srv:
+    image: cosmtrek/air
+    working_dir: /project
+    volumes:
+      - ./barcode/:/project/
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - RDM_HOST=rdb
+      - RDM_PORT=5432
+      - RDM_USER=postgres
+      - RDM_PASSWORD=example
+      - RDM_DB=testing
+      - RDM_MIGRATION=false
+      - TIME_ZONE=Asia/Bangkok
+    command: air
+    depends_on:
+      - rdb
+  order-srv:
+    image: cosmtrek/air
+    working_dir: /project
+    volumes:
+      - ./order/:/project/
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - RDM_HOST=rdb
+      - RDM_PORT=5432
+      - RDM_USER=postgres
+      - RDM_PASSWORD=example
+      - RDM_DB=testing
+      - RDM_MIGRATION=false
+      - TIME_ZONE=Asia/Bangkok
+    command: air
+    depends_on:
+      - rdb
+
+volumes:
+  rdb:
+    driver: local
