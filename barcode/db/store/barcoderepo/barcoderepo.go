@@ -80,3 +80,24 @@ func (b BarcodeRepo) Create(i dto.BarCodeInput) (core.BarcodeCondition, error) {
 
 	return nBc, nil
 }
+
+/*UpdateByID New Barcode Data */
+func (b BarcodeRepo) UpdateByID(id uint, u dto.BarCodeUpdate) error {
+	r := b.db.Model(&core.BarcodeCondition{}).Where("id = ?", id).Updates(core.BarcodeCondition{BatchSize: u.BatchSize})
+
+	if r.RowsAffected != 1 {
+		return errors.New("Barcode Condition Not Found")
+	}
+
+	return nil
+}
+
+/*DeleteByID Remove Barcode From Database */
+func (b BarcodeRepo) DeleteByID(id uint) error {
+	r := b.db.Delete(&core.BarcodeCondition{}, id)
+	if r.RowsAffected != 1 {
+		return errors.New("Barcode Condition Not Found")
+	}
+
+	return nil
+}
