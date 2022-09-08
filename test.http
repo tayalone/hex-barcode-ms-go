@@ -8,16 +8,16 @@ GET {{hostname}}:{{barcode_port}}/healtz HTTP/1.1
 ####
 
 
-GET {{hostname}}:{{barcode_port}}/barcode HTTP/1.1
+GET {{hostname}}:{{barcode_port}} HTTP/1.1
 ####
 
 
 
-GET {{hostname}}:{{barcode_port}}/barcode/1 HTTP/1.1
+GET {{hostname}}:{{barcode_port}}/1 HTTP/1.1
 ####
 
 
-POST  {{hostname}}:{{barcode_port}}/barcode HTTP/1.1
+POST  {{hostname}}:{{barcode_port}} HTTP/1.1
 content-type: application/json
 
 {
@@ -29,7 +29,7 @@ content-type: application/json
 ###
 
 
-PATCH {{hostname}}:{{barcode_port}}/barcode/3 HTTP/1.1
+PATCH {{hostname}}:{{barcode_port}}/3 HTTP/1.1
 content-type: application/json
 
 {
@@ -40,7 +40,7 @@ content-type: application/json
 ###
 
 ###
-DELETE  {{hostname}}:{{barcode_port}}/barcode/3 HTTP/1.1
+DELETE  {{hostname}}:{{barcode_port}}/3 HTTP/1.1
 
 
 ###
