@@ -7,6 +7,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/core/dto"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/core/ports"
+	"github.com/tayalone/hex-barcode-ms-go/barcode/mq"
 )
 
 /*ReInst is a Queue Reciever Instant */
@@ -38,13 +39,13 @@ func (r ReInst) Receive() {
 	}
 
 	msgs, err := r.ch.Consume(
-		QueueName, // queue
-		"",        // consumer
-		false,     // auto-ack
-		false,     // exclusive
-		false,     // no-local
-		false,     // no-wait
-		nil,       // args
+		mq.QueueName["req_barcode"], // queue
+		"",                          // consumer
+		false,                       // auto-ack
+		false,                       // exclusive
+		false,                       // no-local
+		false,                       // no-wait
+		nil,                         // args
 	)
 	if err != nil {
 		log.Fatalln("reqbarcode Consume error", err.Error())

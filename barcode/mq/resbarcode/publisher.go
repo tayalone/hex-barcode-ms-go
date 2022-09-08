@@ -7,6 +7,7 @@ import (
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/core/dto"
+	"github.com/tayalone/hex-barcode-ms-go/barcode/mq"
 )
 
 /*PbInst is a Queue Reciever Instant */
@@ -27,7 +28,6 @@ func NewPublisher(ch *amqp.Channel, q amqp.Queue) PbInst {
 /*PushMessage Send Message to Reciever */
 func (r PbInst) PushMessage(i dto.PublisherInput) error {
 	ch := r.ch
-	q := r.q
 
 	body, errMs := json.Marshal(i)
 	if errMs != nil {
@@ -36,9 +36,9 @@ func (r PbInst) PushMessage(i dto.PublisherInput) error {
 	}
 
 	err := ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
+		"",                          // exchange
+		mq.QueueName["req_barcode"], // routing key
+		false,                       // mandatory
 		false,
 		amqp.Publishing{
 			DeliveryMode: amqp.Persistent,

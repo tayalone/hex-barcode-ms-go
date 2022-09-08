@@ -12,8 +12,6 @@ import (
 
 func main() {
 	/* ------------- pre defined -------------- */
-	rdbStore := store.New()
-	store := rdbStore.GetInstant()
 
 	myMq := mq.ConnectMQ()
 
@@ -23,11 +21,13 @@ func main() {
 	myCh := myMq.GetCh()
 	defer myCh.Close()
 
-	qReqBarcode, _ := reqbarcode.InitQueue(myCh)
-	qResBarcode, _ := resbarcode.InitQueue(myCh)
+	qReqBarcode, _ := myMq.CreateQueue(mq.QueueName["req_barcode"])
+	qResBarcode, _ := myMq.CreateQueue(mq.QueueName["res_barcode"])
 
 	/* ---------------------------------------- */
 	/* ------------- defined API -------------- */
+	rdbStore := store.New()
+	store := rdbStore.GetInstant()
 	barcodeRepo := barcoderepo.New(store)
 	resBarcodePb := resbarcode.NewPublisher(myCh, *qResBarcode)
 	/* ---------------------------------------- */

@@ -6,16 +6,36 @@ import (
 	"os"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/tayalone/hex-barcode-ms-go/barcode/core/dto"
 )
 
-/*Conn is Definition of Value */
+/*QueueName get Queue Name by Key*/
+var QueueName = map[string]string{
+	"req_barcode": "REQ_BARCODE",
+	"res_barcode": "RES_BARCODE",
+}
+
+/*Conn is Definition of Value
+ */
 type Conn interface {
 	GetConn() *amqp.Connection
 	GetCh() *amqp.Channel
 	GetStatus() bool
+	CreateQueue(name string) (*amqp.Queue, error)
 }
 
-/*MQ is Definition of Value */
+/*Publisher is Bahavior of Message Q*/
+type Publisher interface {
+	PushMessage(i dto.ReceiverInput) error
+}
+
+/*Receive is Bahavior of Message Q*/
+type Receive interface {
+	Receive()
+}
+
+/*MQ is Definition of Value
+ */
 type MQ struct {
 	mq       *amqp.Connection
 	ch       *amqp.Channel
@@ -97,4 +117,22 @@ func (mq *MQ) GetStatus() bool {
 		return false
 	}
 	return true
+}
+
+/*CreateQueue with Name*/
+func (mq *MQ) CreateQueue(name string) (*amqp.Queue, error) {
+	q, err := mq.ch.QueueDeclare(
+		name,  // name
+		true,  // durable
+		false, // delete when unused
+		false, // exclusive
+		false, // no-wait
+		nil,   // arguments
+	)
+	if err != nil {
+		// myInst.errMsg = err.Error()
+		// log.Println("Connect Queue", QueueName, "Error", err.Error())
+		return nil, err
+	}
+	return &q, nil
 }
