@@ -10,7 +10,7 @@ import (
 
 /*Router is Sturcture */
 type Router struct {
-	barcodeSrv ports.BarcodeRpstr
+	barcodeSrv ports.BarcodeSrv
 }
 
 /*Handler is Define Reouter Befavior */
@@ -23,7 +23,7 @@ type Handler interface {
 }
 
 /*New Return New Routner Handler */
-func New(b ports.BarcodeRpstr) *Router {
+func New(b ports.BarcodeSrv) *Router {
 	return &Router{
 		barcodeSrv: b,
 	}

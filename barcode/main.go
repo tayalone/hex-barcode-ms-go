@@ -12,6 +12,7 @@ import (
 	"github.com/tayalone/hex-barcode-ms-go/barcode/mq"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/mq/reqbarcode"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/mq/resbarcode"
+	"github.com/tayalone/hex-barcode-ms-go/barcode/router"
 )
 
 func main() {
@@ -41,6 +42,9 @@ func main() {
 	reqBCReceiver := reqbarcode.NewReceiver(myCh, *qReqBarcode, barcodeSrv)
 	go reqBCReceiver.Receive()
 
+	routeHandler := router.New(barcodeSrv)
+	/* --------------------------------------- */
+
 	r := gin.Default()
 	r.GET("/healtz", func(c *gin.Context) {
 		storeStatus := myMq.GetStatus()
@@ -55,6 +59,12 @@ func main() {
 		})
 		return
 	})
+
+	r.GET("/", routeHandler.FindAll)
+	r.GET("/:id", routeHandler.GetByID)
+	r.POST("/", routeHandler.Create)
+	r.PATCH("/:id", routeHandler.UpdateByID)
+	r.DELETE("/:id", routeHandler.DeleteByID)
+
 	r.Run(fmt.Sprintf(":%s", os.Getenv("PORT"))) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
-	/* --------------------------------------- */
 }
