@@ -19,10 +19,10 @@ type PbInst struct {
 var myPbInst = PbInst{}
 
 /*NewPublisher do Return Qeue Reciever */
-func NewPublisher(ch *amqp.Channel, q amqp.Queue) PbInst {
+func NewPublisher(ch *amqp.Channel, q amqp.Queue) *PbInst {
 	myReInst.ch = ch
 	myReInst.q = q
-	return myPbInst
+	return &myPbInst
 }
 
 /*PushMessage Send Message to Reciever */

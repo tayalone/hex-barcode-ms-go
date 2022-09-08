@@ -19,20 +19,20 @@ var barcodeRepo = BarcodeRepo{}
 var emptyBc = core.BarcodeCondition{}
 
 /*New do Create Rdb Connection*/
-func New(db *gorm.DB) BarcodeRepo {
+func New(db *gorm.DB) *BarcodeRepo {
 	barcodeRepo.db = db
-	return barcodeRepo
+	return &barcodeRepo
 }
 
 /*GetAll Barcode Codition From Repo*/
-func (b BarcodeRepo) GetAll() []core.BarcodeCondition {
+func (b *BarcodeRepo) GetAll() []core.BarcodeCondition {
 	var bcs []core.BarcodeCondition
 	b.db.Order("created_at desc,id desc").Order("created_at desc,id desc").Find(&bcs)
 	return bcs
 }
 
 /*GetByID Barcode Codition From ID From Repo*/
-func (b BarcodeRepo) GetByID(id uint) (core.BarcodeCondition, error) {
+func (b *BarcodeRepo) GetByID(id uint) (core.BarcodeCondition, error) {
 	var bc core.BarcodeCondition
 
 	r := b.db.First(&bc, id)
@@ -44,7 +44,7 @@ func (b BarcodeRepo) GetByID(id uint) (core.BarcodeCondition, error) {
 }
 
 /*GetByCond return Condition by Courier Code & IsCod From Repo*/
-func (b BarcodeRepo) GetByCond(courierCode string, isCod bool) (core.BarcodeCondition, error) {
+func (b *BarcodeRepo) GetByCond(courierCode string, isCod bool) (core.BarcodeCondition, error) {
 	var ltBc core.BarcodeCondition
 	ltBc.CourierCode = courierCode
 	ltBc.IsCod = isCod
@@ -58,7 +58,7 @@ func (b BarcodeRepo) GetByCond(courierCode string, isCod bool) (core.BarcodeCond
 }
 
 /*Create New Barcode Condition*/
-func (b BarcodeRepo) Create(i dto.BarCodeInput) (core.BarcodeCondition, error) {
+func (b *BarcodeRepo) Create(i dto.BarCodeInput) (core.BarcodeCondition, error) {
 	ltBc, errLtBc := b.GetByCond(i.CourierCode, i.IsCod)
 	if errLtBc != nil {
 		return emptyBc, errLtBc
@@ -82,7 +82,7 @@ func (b BarcodeRepo) Create(i dto.BarCodeInput) (core.BarcodeCondition, error) {
 }
 
 /*UpdateByID New Barcode Data */
-func (b BarcodeRepo) UpdateByID(id uint, u dto.BarCodeUpdate) error {
+func (b *BarcodeRepo) UpdateByID(id uint, u dto.BarCodeUpdate) error {
 	r := b.db.Model(&core.BarcodeCondition{}).Where("id = ?", id).Updates(core.BarcodeCondition{BatchSize: u.BatchSize})
 
 	if r.RowsAffected != 1 {
@@ -93,7 +93,7 @@ func (b BarcodeRepo) UpdateByID(id uint, u dto.BarCodeUpdate) error {
 }
 
 /*DeleteByID Remove Barcode From Database */
-func (b BarcodeRepo) DeleteByID(id uint) error {
+func (b *BarcodeRepo) DeleteByID(id uint) error {
 	r := b.db.Delete(&core.BarcodeCondition{}, id)
 	if r.RowsAffected != 1 {
 		return errors.New("Barcode Condition Not Found")

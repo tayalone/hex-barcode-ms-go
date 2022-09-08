@@ -55,6 +55,14 @@ services:
     depends_on:
       - rdb
       - rabbitmq
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1000M
+        reservations:
+          cpus: "1"
+          memory: 1000M
   # order-srv:
   #   image: cosmtrek/air
   #   working_dir: /project
