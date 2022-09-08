@@ -29,3 +29,8 @@ type PublisherInput struct {
 	ID          uint   `json:"id" binding:"required"`
 	Barcode     string `json:"barcode" binding:"required"`
 }
+
+/*GetIDUri is Get ID From Parmas */
+type GetIDUri struct {
+	ID uint `uri:"id" binding:"required"`
+}

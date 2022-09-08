@@ -130,8 +130,6 @@ func (mq *MQ) CreateQueue(name string) (*amqp.Queue, error) {
 		nil,   // arguments
 	)
 	if err != nil {
-		// myInst.errMsg = err.Error()
-		// log.Println("Connect Queue", QueueName, "Error", err.Error())
 		return nil, err
 	}
 	return &q, nil

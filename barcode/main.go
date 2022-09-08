@@ -1,18 +1,21 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/core/service"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/db/store"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/db/store/barcoderepo"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/mq"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/mq/reqbarcode"
 	"github.com/tayalone/hex-barcode-ms-go/barcode/mq/resbarcode"
-	"github.com/tayalone/hex-barcode-ms-go/barcode/router"
 )
 
 func main() {
 	/* ------------- pre defined -------------- */
-
 	myMq := mq.ConnectMQ()
 
 	myConn := myMq.GetConn()
@@ -38,6 +41,20 @@ func main() {
 	reqBCReceiver := reqbarcode.NewReceiver(myCh, *qReqBarcode, barcodeSrv)
 	go reqBCReceiver.Receive()
 
-	router.Init()
+	r := gin.Default()
+	r.GET("/healtz", func(c *gin.Context) {
+		storeStatus := myMq.GetStatus()
+		if storeStatus == true {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "OK",
+			})
+			return
+		}
+		c.JSON(http.StatusTeapot, gin.H{
+			"Message": "Services Not Ready",
+		})
+		return
+	})
+	r.Run(fmt.Sprintf(":%s", os.Getenv("PORT"))) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 	/* --------------------------------------- */
 }
