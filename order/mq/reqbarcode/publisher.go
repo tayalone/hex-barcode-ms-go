@@ -1,4 +1,4 @@
-package resbarcode
+package reqbarcode
 
 import (
 	"encoding/json"
@@ -6,8 +6,9 @@ import (
 	"log"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/tayalone/hex-barcode-ms-go/barcode/core/dto"
-	"github.com/tayalone/hex-barcode-ms-go/barcode/mq"
+
+	"github.com/tayalone/hex-barcode-ms-go/order/core/dto"
+	"github.com/tayalone/hex-barcode-ms-go/order/mq"
 )
 
 /*PbInst is a Queue Reciever Instant */
@@ -37,7 +38,7 @@ func (r PbInst) PushMessage(i dto.PublisherInput) error {
 
 	err := ch.Publish(
 		"",                          // exchange
-		mq.QueueName["res_barcode"], // routing key
+		mq.QueueName["req_barcode"], // routing key
 		false,                       // mandatory
 		false,
 		amqp.Publishing{

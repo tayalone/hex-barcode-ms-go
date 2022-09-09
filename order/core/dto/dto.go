@@ -13,3 +13,10 @@ type UpdateBarcode struct {
 	ID          uint   `json:"id" binding:"required"`
 	Barcode     string `json:"barcode" binding:"required"`
 }
+
+/*PublisherInput is Structor of Bady Params */
+type PublisherInput struct {
+	CourierCode string `json:"courierCode" binding:"required"`
+	IsCod       bool   `json:"isCod" binding:"required"`
+	ID          uint   `json:"id" binding:"required"`
+}
